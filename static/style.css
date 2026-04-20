@@ -1,0 +1,114 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #EAEAEA;
+}
+
+.container, header {
+    margin: 15px auto;
+    padding: 15px;
+    background-color: white;
+    box-shadow: 0 1px 2px black;
+    border-radius: 15px 5px;
+    width: 1015px;
+}
+
+img {
+    vertical-align: top;
+}
+
+header ul {
+    list-style-type: none;
+}
+
+header a, .not-found-info a, .books-item a {
+    text-decoration: none;
+    color: black;
+}
+
+header li a:hover, .not-found-info a:hover, .books-item a:hover {
+    text-decoration: underline;
+}
+
+.header-logo, .not-found #logo {
+    font-weight: bold;
+    font-size: 48px;
+    font-style: italic;
+    font-family: monospace;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.book-content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.book-art {
+    width: 220px;
+}
+
+.book-desc {
+    width: 780px;
+}
+
+#book-title, .book-info {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.books-item {
+    background: white;
+    border: 1px solid #a3a3a3;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 5px;
+}
+
+.not-found {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    gap: 30px;
+}
+
+.not-found #logo {
+    font-size: 200px;
+}
+
+.not-found #logo span {
+    color: red;
+}
+
+.not-found-info {
+    font-size: 22px;
+    width: 400px;
+    text-align: right;
+}
+
+.not-found-info #links {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.search-field {
+    font-size: 48px;
+    padding: 12px;
+    margin: 24px;
+    border-radius: 10px;
+    border: 1px solid #a3a3a3;
+}

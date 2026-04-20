@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Все книги{% endblock %}
+
+{% block content %}
+    <div class="book-content">
+        {% for book in books %}
+            <div class="books-item">
+                <div class="book-art">
+                    <a href="/book/{{ book.book_id }}">
+                        <img src="{% if book.artwork %}{{ book.artwork }}{% else %}{{ url_for('static', filename='blank.png') }}{% endif %}">
+                        <span class="book-info">
+                            {{ book.title }} ({{ book.year }} год)
+                        </span>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+  
+{% block content %}
+    <center>
+        <form method="get" action="/search">
+            <p><input type="text" name="q" id="q" class="search-field" placeholder="Поиск книг..."></p>
+        </form>
+    </center>
+{% endblock %}

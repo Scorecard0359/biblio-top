@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Поиск{% endblock %}
+  
+{% block content %}
+    {% if query %}
+        {% if books %}
+            <h2>По запросу <b>"{{ query }}"</b> найдены следующие книги:</h2>
+            <div class="book-content">
+                {% for book in books %}
+                    <div class="books-item">
+                        <div class="book-art">
+                            <a href="/book/{{ book.book_id }}">
+                                <img src="{% if book.artwork %}{{ book.artwork }}{% else %}{{ url_for('static', filename='blank.png') }}{% endif %}">
+                                <span class="book-info">
+                                    {{ book.title }} ({{ book.year }} год)
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h2>По запросу <b>"{{ query }}"</b> ничего не найдено.</h2>
+        {% endif %}
+    {% else %}
+        <center>
+            <form method="get">
+                <p><input type="text" name="q" id="q" class="search-field" placeholder="Поиск книг..."></p>
+            </form>
+        </center>
+    {% endif %}    
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} ({{ book.year }}){% endblock %}
+  
+{% block content %}
+    <div class="book-content">
+        <div class="book-art">
+            <img src="{% if book.artwork %}{{ book.artwork }}{% else %}{{ url_for('static', filename='blank.png') }}{% endif %}">
+        </div>
+        <div class="book-desc">
+            <p id="book-title">{{ book.title }} ({{ book.year }} год)</p>
+            <p>{{ book.author }}, {{ book.max_pages }} страниц</p>
+            {% if book.description %}
+                <p>{{ book.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
