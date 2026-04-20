@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for, g
-#from markupsafe import escape
-import sqlite3, secrets, time
 from werkzeug.exceptions import abort
+import sqlite3, secrets, time
 app = Flask(__name__)
 
 # Генерировать с помощью команды `py -3 -c "import secrets; print(secrets.token_hex())"`
@@ -119,7 +118,7 @@ def show_book(book_id=None):
         return redirect(url_for('index'))
 
 @app.route('/edit_book')
-@app.route('/edit_book/<int:book_id>', methods=['POST', 'GET'])
+@app.route('/edit_book/<int:book_id>', methods=['POST'])
 def edit_books(book_id=None):
     if 'user' not in g:
         return redirect(url_for('index'))
@@ -141,7 +140,7 @@ def edit_books(book_id=None):
         else:
             abort(403)
 
-@app.route('/add_book', methods=['POST', 'GET'])
+@app.route('/add_book', methods=['POST'])
 def create_book():
     if 'user' not in g:
         return redirect(url_for('index'))
@@ -155,7 +154,7 @@ def create_book():
         else:
             abort(403)
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login', methods=['POST'])
 def show_login():
     if 'user' not in g:
         error = None
@@ -171,7 +170,7 @@ def show_login():
     else:
         return redirect(url_for('index'))
 
-@app.route('/register', methods=['POST', 'GET'])
+@app.route('/register', methods=['POST'])
 def show_register():
     if 'user' not in g:
         error = None
