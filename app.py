@@ -140,7 +140,7 @@ def edit_books(book_id=None):
         else:
             abort(403)
 
-@app.route('/add_book', methods=['POST'])
+@app.route('/add_book', methods=['POST', 'GET'])
 def create_book():
     if 'user' not in g:
         return redirect(url_for('index'))
@@ -154,7 +154,7 @@ def create_book():
         else:
             abort(403)
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def show_login():
     if 'user' not in g:
         error = None
@@ -170,7 +170,7 @@ def show_login():
     else:
         return redirect(url_for('index'))
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['POST', 'GET'])
 def show_register():
     if 'user' not in g:
         error = None
