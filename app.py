@@ -4,8 +4,8 @@ import sqlite3, secrets, time
 from werkzeug.exceptions import abort
 app = Flask(__name__)
 
-# Не стоит использовать в проде!
-app.secret_key = b'dc566b25c26ac0f2d5a96321a155c41133ecdc8409ff868ec063a2c3e8414e75'
+# Генерировать с помощью команды `py -3 -c "import secrets; print(secrets.token_hex())"`
+#app.secret_key = b'dc566b25c26ac0f2d5a96321a155c41133ecdc8409ff868ec063a2c3e8414e75'
 
 def get_db():
     if 'db' not in g:
