@@ -1,0 +1,39 @@
+CREATE TABLE "books" IF NOT EXISTS (
+	"book_id"	INTEGER,
+	"title"	TEXT NOT NULL,
+	"year"	INTEGER DEFAULT 1970,
+	"author"	TEXT NOT NULL,
+	"max_pages"	INTEGER NOT NULL,
+	"description"	TEXT,
+	"artwork"	TEXT,
+	PRIMARY KEY("book_id" AUTOINCREMENT)
+)
+
+CREATE TABLE "progress" IF NOT EXISTS (
+	"id"	INTEGER,
+	"reader_id"	INTEGER NOT NULL,
+	"book_id"	INTEGER NOT NULL,
+	"pages"	INTEGER DEFAULT 0,
+	"start_date"	INTEGER,
+	"end_date"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("book_id") REFERENCES "books"("book_id"),
+	FOREIGN KEY("reader_id") REFERENCES "readers"("reader_id")
+)
+
+CREATE TABLE "readers" IF NOT EXISTS (
+	"reader_id"	INTEGER,
+	"username"	TEXT NOT NULL,
+	"password"	TEXT NOT NULL,
+	"display_name"	TEXT,
+	"is_admin"	INTEGER DEFAULT 0,
+	PRIMARY KEY("reader_id" AUTOINCREMENT)
+)
+
+CREATE TABLE "tokens" IF NOT EXISTS (
+	"token"	TEXT NOT NULL UNIQUE,
+	"reader_id"	INTEGER NOT NULL,
+	"date_created"	INTEGER NOT NULL,
+	"date_lastauth"	INTEGER NOT NULL,
+	FOREIGN KEY("reader_id") REFERENCES "readers"("reader_id")
+)

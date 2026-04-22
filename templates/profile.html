@@ -10,17 +10,19 @@
                 <th>Страниц</th>
                 <th>Дата начала прочтения</th>
                 <th>Дата конца прочтения</th>
+                <th>Действия</th>
             </tr>
             {% for book in progress %}
                 <tr>
                     <th><a href="/book/{{ book.book_id }}">{{ book.title }}</a></th>
                     <td>{{ book.pages }} из {{ book.max_pages }}</td>
-                    <td>{% if book.start_date %}{{ book.start_date }}{% else %}Нет даты{% endif %}</td>
-                    <td>{% if book.end_date %}{{ book.end_date }}{% else %}Нет даты{% endif %}</td>
+                    <td>{% if book.start_date %}{{ book.start_date }}{% else %}-{% endif %}</td>
+                    <td>{% if book.end_date %}{{ book.end_date }}{% else %}-{% endif %}</td>
+                    <td><a href="/editprogress/{{ book.book_id }}">Удалить</a>, <a href="/profile/edit/{{ book.book_id }}">изменить</a></td>
                 </tr>
             {% endfor %}
         </table>
     {% else %}
-        Лошпедос
+        <p>Пусто... может Вы хотели <a href="/books">открыть каталог</a>?</p>
     {% endif %}
 {% endblock %}
