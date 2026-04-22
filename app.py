@@ -12,7 +12,7 @@ def get_db():
         g.db.row_factory = sqlite3.Row
     return g.db
 
-def close_db(e=None):
+def close_db():
     db = g.pop('db', None)
     if db is not None:
         db.close()
@@ -70,6 +70,27 @@ def search_book(name):
     name = f'%{name}%'
     return get_db().execute("SELECT * FROM books WHERE `title` LIKE ?", (name,)).fetchall()
 
+def is_in_progress(token, book_id):
+    db = get_db()
+    user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
+    progress_id = db.execute("SELECT id FROM progress WHERE `reader_id` = ? AND `book_id` = ?", (user_id[0], book_id)).fetchone()
+    return progress_id
+
+def change_progress(token, book_id):
+    db = get_db()
+    progress_id = is_in_progress(token, book_id)
+    user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
+    if progress_id:
+        db.execute("DELETE FROM progress WHERE `id` = ?", (progress_id[0],))
+    else:
+        db.execute("INSERT INTO progress (reader_id, book_id) VALUES (?, ?)", (user_id[0], book_id))
+    db.commit()
+
+def get_progress(token):
+    db = get_db()
+    user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
+    return db.execute("SELECT *, books.title, books.max_pages FROM progress JOIN books ON progress.book_id = books.book_id WHERE `reader_id` = ?", (user_id[0],)).fetchall()
+
 def is_admin(token):
     db = get_db()
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
@@ -95,30 +116,46 @@ def index():
 def search():
     query = None
     books = None
+    count = None
     if request.method == 'GET':
         query = request.args.get('q', '')
         books = search_book(query)
-    return render_template('search.html', query=query, books=books)
+        count = len(books)
+    return render_template('search.html', query=query, books=books, count=count)
 
 @app.route('/books')
 def show_books():
     books = get_books()
-    return render_template('books.html', books=books)
+    count = len(books)
+    return render_template('books.html', books=books, count=count)
 
 @app.route('/book/<int:book_id>')
 def show_book(book_id=None):
     if book_id:
         book = get_book(book_id)
-        rating = 0
+        in_progress = None
         if book:
-            return render_template('book.html', book=book, rating=rating)
+            if 'user' in g:
+                in_progress = is_in_progress(session['token'], book_id)
+            return render_template('book.html', book=book, in_progress=in_progress)
         else:
             abort(404)
     else:
         return redirect(url_for('index'))
 
+@app.route('/editprogress/<int:book_id>')
+def edit_progress(book_id=None):
+    if 'user' not in g:
+        abort(403)
+    else:
+        if get_book(book_id):
+            change_progress(session['token'], book_id)
+            return redirect(url_for('show_book', book_id=book_id))
+        else:
+            abort(404)
+
 @app.route('/edit_book')
-@app.route('/edit_book/<int:book_id>', methods=['POST'])
+@app.route('/edit_book/<int:book_id>', methods=['POST', 'GET'])
 def edit_books(book_id=None):
     if 'user' not in g:
         return redirect(url_for('index'))
@@ -186,6 +223,14 @@ def show_register():
         return render_template('register.html', error=error)
     else:
         return redirect(url_for('index'))
+
+@app.route('/profile')
+def profile():
+    if 'user' not in g:
+        return redirect(url_for('show_login'))
+    else:
+        progress = get_progress(session['token'])
+        return render_template('profile.html', progress=progress)
 
 @app.route('/logout')
 def logout():

@@ -5,7 +5,7 @@
 {% block content %}
     {% if query %}
         {% if books %}
-            <h2>По запросу <b>"{{ query }}"</b> найдены следующие книги:</h2>
+            <h2>По запросу <b>"{{ query }}"</b> найдено {{ count }} книг:</h2>
             <div class="book-content">
                 {% for book in books %}
                     <div class="books-item">
@@ -24,10 +24,10 @@
             <h2>По запросу <b>"{{ query }}"</b> ничего не найдено.</h2>
         {% endif %}
     {% else %}
-        <center>
+        <div style="text-align: center;">
             <form method="get">
                 <p><input type="text" name="q" id="q" class="search-field" placeholder="Поиск книг..."></p>
             </form>
-        </center>
+        </div>
     {% endif %}    
 {% endblock %}

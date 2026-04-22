@@ -6,6 +6,11 @@
     <div class="book-content">
         <div class="book-art">
             <img src="{% if book.artwork %}{{ book.artwork }}{% else %}{{ url_for('static', filename='blank.png') }}{% endif %}">
+            {% if g.user %}
+                <a href="/editprogress/{{ book.book_id }}" style="text-decoration: none">
+                    <div class="add_to_profile">{% if in_progress %}Убрать из профиля{% else %}Добавить в профиль{% endif %}</div>
+                </a>
+            {% endif %}
         </div>
         <div class="book-desc">
             <p id="book-title">{{ book.title }} ({{ book.year }} год)</p>

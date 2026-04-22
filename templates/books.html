@@ -3,6 +3,7 @@
 {% block title %}Все книги{% endblock %}
 
 {% block content %}
+    <h1>В сервис загружено {{ count }} книг.</h1>
     <div class="book-content">
         {% for book in books %}
             <div class="books-item">

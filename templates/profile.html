@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль {{ g.user.username }}{% endblock %}
+  
+{% block content %}
+    {% if progress %}
+        <table>
+            <tr>
+                <th>Название</th>
+                <th>Страниц</th>
+                <th>Дата начала прочтения</th>
+                <th>Дата конца прочтения</th>
+            </tr>
+            {% for book in progress %}
+                <tr>
+                    <th><a href="/book/{{ book.book_id }}">{{ book.title }}</a></th>
+                    <td>{{ book.pages }} из {{ book.max_pages }}</td>
+                    <td>{% if book.start_date %}{{ book.start_date }}{% else %}Нет даты{% endif %}</td>
+                    <td>{% if book.end_date %}{{ book.end_date }}{% else %}Нет даты{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        Лошпедос
+    {% endif %}
+{% endblock %}
