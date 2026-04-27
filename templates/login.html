@@ -7,8 +7,10 @@
         <p>{{ error }}!</p>
     {% endif %}
     <form method="post">
-        <p><input type=text name=username>
-        <p><input type=password name=password>
-        <p><input type=submit value=Login>
+        <p><label for="username">Имя пользователя:</label></p>
+        <p><input type="text" name="username" id="username"></p>
+        <p><label for="password">Пароль:</label></p>
+        <p><input type="password" name="password" id="password"></p>
+        <p><input type="submit" value="Войти"></p>
     </form>
 {% endblock %}

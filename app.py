@@ -91,6 +91,16 @@ def get_progress(token):
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
     return db.execute("SELECT *, books.title, books.max_pages FROM progress JOIN books ON progress.book_id = books.book_id WHERE `reader_id` = ?", (user_id[0],)).fetchall()
 
+def get_prog_one(token, book_id):
+    db = get_db()
+    progress_id = is_in_progress(token, book_id)
+    return db.execute("SELECT *, books.max_pages FROM progress JOIN books ON progress.book_id = books.book_id WHERE progress.id = ?", (progress_id[0],)).fetchone()
+
+def edit_progress(progress_id, pages, start_date, end_date):
+    db = get_db()
+    db.execute("UPDATE progress SET `pages` = ?, `start_date` = ?, `end_date` = ? WHERE `id` = ?", (pages, start_date, end_date, progress_id))
+    db.commit()
+
 def is_admin(token):
     db = get_db()
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
@@ -144,7 +154,7 @@ def show_book(book_id=None):
         return redirect(url_for('index'))
 
 @app.route('/editprogress/<int:book_id>')
-def edit_progress(book_id=None):
+def del_progress(book_id=None):
     if 'user' not in g:
         abort(403)
     else:
@@ -231,6 +241,27 @@ def profile():
     else:
         progress = get_progress(session['token'])
         return render_template('profile.html', progress=progress)
+
+@app.route('/profile/edit/<int:book_id>', methods=['POST', 'GET'])
+def edit_prog(book_id=None):
+    if 'user' not in g:
+        return redirect(url_for('show_login'))
+    else:
+        notify = None
+        if book_id:
+            progress_id = is_in_progress(session['token'], book_id)
+            if progress_id:
+                progress = get_prog_one(session['token'], book_id)
+                if progress:
+                    if request.method == 'POST':
+                        edit_progress(progress_id[0], request.form['pages'], request.form['start_date'], request.form['end_date'])
+                        notify = 'Прогресс изменён.'
+                        progress = get_prog_one(session['token'], book_id)
+                    return render_template('edit-prog.html', progress=progress, notify=notify)
+                else:
+                    abort(404)
+            else:
+                abort(404)
 
 @app.route('/logout')
 def logout():

@@ -105,6 +105,18 @@ header {
     margin-top: 10px;
 }
 
+form {
+    text-align: center;
+}
+
+form p {
+    padding: 5px;
+}
+
+input {
+    font-size: 22px;
+}
+
 .search-field {
     font-size: 48px;
     padding: 12px;
@@ -113,7 +125,7 @@ header {
     border: 1px solid #a3a3a3;
 }
 
-.add_to_profile {
+.add_to_profile, input[type=submit] {
     color: black;
     width: 200px;
     text-align: center;
@@ -124,7 +136,7 @@ header {
     background-color: #fdfdfd;
 }
 
-.add_to_profile:hover {
+.add_to_profile:hover, input[type=submit]:hover {
     background-color: #f6f6f6;
 }
 
