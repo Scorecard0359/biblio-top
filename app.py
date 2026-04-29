@@ -67,8 +67,7 @@ def get_books():
     return get_db().execute("SELECT * FROM books").fetchall()
 
 def search_book(name):
-    name = f'%{name}%'
-    return get_db().execute("SELECT * FROM books WHERE `title` LIKE ?", (name,)).fetchall()
+    return get_db().execute("SELECT * FROM books WHERE `title` LIKE ?", (f'%{name}%',)).fetchall()
 
 def is_in_progress(token, book_id):
     db = get_db()
