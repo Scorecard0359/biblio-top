@@ -73,8 +73,7 @@ def search_book(name):
 def is_in_progress(token, book_id):
     db = get_db()
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
-    progress_id = db.execute("SELECT id FROM progress WHERE `reader_id` = ? AND `book_id` = ?", (user_id[0], book_id)).fetchone()
-    return progress_id
+    return db.execute("SELECT id FROM progress WHERE `reader_id` = ? AND `book_id` = ?", (user_id[0], book_id)).fetchone()
 
 def change_progress(token, book_id):
     db = get_db()
@@ -259,9 +258,9 @@ def edit_prog(book_id=None):
                         progress = get_prog_one(session['token'], book_id)
                     return render_template('edit-prog.html', progress=progress, notify=notify)
                 else:
-                    abort(404)
+                    abort(403)
             else:
-                abort(404)
+                abort(403)
 
 @app.route('/logout')
 def logout():

@@ -4,13 +4,13 @@
 
 {% block content %}
     {% if error %}
-        <p>{{ error }}!</p>
+        <div class="notify">{{ error }}</div>
     {% endif %}
     <form method="post">
         <p><label for="username">Имя пользователя:</label></p>
         <p><input type="text" name="username" id="username"></p>
         <p><label for="password">Пароль:</label></p>
         <p><input type="password" name="password" id="password"></p>
-        <p><input type="submit" value="Зарегистрироваться"></p>
+        <p><input type="submit" value="Регистрация"></p>
     </form>
 {% endblock %}

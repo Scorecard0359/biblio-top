@@ -34,7 +34,7 @@ header li a:hover, .not-found-info a:hover, .books-item a:hover {
     text-decoration: underline;
 }
 
-.header-logo, .not-found #logo {
+.header-logo, .not-found #logo, .mainpage-intro #logo {
     font-weight: bold;
     font-size: 48px;
     font-style: italic;
@@ -77,6 +77,13 @@ header {
     border-radius: 5px;
 }
 
+.mainpage-intro {
+    display: flex;
+    width: 600px;
+    margin: 0 auto;
+    align-items: center;
+}
+
 .not-found {
     display: flex;
     align-items: center;
@@ -86,7 +93,7 @@ header {
     gap: 30px;
 }
 
-.not-found #logo {
+.not-found #logo, .mainpage-intro #logo {
     font-size: 200px;
 }
 
@@ -103,6 +110,14 @@ header {
 .not-found-info #links {
     font-size: 18px;
     margin-top: 10px;
+}
+
+.notify {
+    padding: 12px;
+    font-size: 20px;
+    background-color: rgb(255, 213, 135);
+    border-radius: 12px;
+    border: 1px solid rgb(203, 132, 0);
 }
 
 form {
