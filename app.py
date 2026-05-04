@@ -4,7 +4,7 @@ import sqlite3, secrets, time
 app = Flask(__name__)
 
 # Генерировать с помощью команды `py -3 -c "import secrets; print(secrets.token_hex())"`
-#app.secret_key = b'dc566b25c26ac0f2d5a96321a155c41133ecdc8409ff868ec063a2c3e8414e75'
+app.secret_key = b'CHANGE_KEY_HERE'
 
 def get_db():
     if 'db' not in g:
