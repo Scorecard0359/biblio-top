@@ -12,12 +12,7 @@ def get_db():
         g.db.row_factory = sqlite3.Row
     return g.db
 
-def close_db():
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
-
-def valid_login(username, password):
+def create_token(username, password):
     db = get_db()
     reader_id = db.execute("SELECT reader_id FROM readers WHERE `username` = ? AND `password` = ?", (username, password)).fetchone()
     if reader_id:
@@ -28,12 +23,12 @@ def valid_login(username, password):
         return token
     return None
 
-def invalid_token(token):
+def delete_token(token):
     db = get_db()
     db.execute("DELETE FROM tokens WHERE `token` = ?", (token,))
     db.commit()
 
-def token_is_valid(token):
+def validate_token(token):
     db = get_db()
     result = db.execute("SELECT token FROM tokens WHERE `token` = ?", (token,)).fetchone()
     if result is not None:
@@ -69,14 +64,14 @@ def get_books():
 def search_book(name):
     return get_db().execute("SELECT * FROM books WHERE `title` LIKE ?", (f'%{name}%',)).fetchall()
 
-def is_in_progress(token, book_id):
+def book_get_progress(token, book_id):
     db = get_db()
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
     return db.execute("SELECT id FROM progress WHERE `reader_id` = ? AND `book_id` = ?", (user_id[0], book_id)).fetchone()
 
 def change_progress(token, book_id):
     db = get_db()
-    progress_id = is_in_progress(token, book_id)
+    progress_id = book_get_progress(token, book_id)
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
     if progress_id:
         db.execute("DELETE FROM progress WHERE `id` = ?", (progress_id[0],))
@@ -84,22 +79,22 @@ def change_progress(token, book_id):
         db.execute("INSERT INTO progress (reader_id, book_id) VALUES (?, ?)", (user_id[0], book_id))
     db.commit()
 
-def get_progress(token):
+def profile_get_all_progress(token):
     db = get_db()
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
     return db.execute("SELECT *, books.title, books.max_pages FROM progress JOIN books ON progress.book_id = books.book_id WHERE `reader_id` = ?", (user_id[0],)).fetchall()
 
-def get_prog_one(token, book_id):
+def profile_get_progress(token, book_id):
     db = get_db()
-    progress_id = is_in_progress(token, book_id)
+    progress_id = book_get_progress(token, book_id)
     return db.execute("SELECT *, books.max_pages FROM progress JOIN books ON progress.book_id = books.book_id WHERE progress.id = ?", (progress_id[0],)).fetchone()
 
-def edit_progress(progress_id, pages, start_date, end_date):
+def profile_edit_progress(progress_id, pages, start_date, end_date):
     db = get_db()
     db.execute("UPDATE progress SET `pages` = ?, `start_date` = ?, `end_date` = ? WHERE `id` = ?", (pages, start_date, end_date, progress_id))
     db.commit()
 
-def is_admin(token):
+def profile_check_admin_access(token):
     db = get_db()
     user_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
     admin = db.execute("SELECT is_admin FROM readers WHERE `reader_id` = ?", (user_id[0],)).fetchone()
@@ -109,7 +104,7 @@ def is_admin(token):
 def check_token():
     if 'token' in session:
         token = session['token']
-        if token_is_valid(token):
+        if validate_token(token):
             db = get_db()
             reader_id = db.execute("SELECT reader_id FROM tokens WHERE `token` = ?", (token,)).fetchone()
             g.user = db.execute("SELECT * FROM readers WHERE `reader_id` = ?", (reader_id[0],)).fetchone()
@@ -144,7 +139,7 @@ def show_book(book_id=None):
         in_progress = None
         if book:
             if 'user' in g:
-                in_progress = is_in_progress(session['token'], book_id)
+                in_progress = book_get_progress(session['token'], book_id)
             return render_template('book.html', book=book, in_progress=in_progress)
         else:
             abort(404)
@@ -168,7 +163,7 @@ def edit_books(book_id=None):
     if 'user' not in g:
         return redirect(url_for('index'))
     else:
-        if is_admin(session['token']):
+        if profile_check_admin_access(session['token']):
             notify = None
             if book_id:
                 if request.method == 'POST':
@@ -190,7 +185,7 @@ def create_book():
     if 'user' not in g:
         return redirect(url_for('index'))
     else:
-        if is_admin(session['token']):
+        if profile_check_admin_access(session['token']):
             notify = None
             if request.method == 'POST':
                 add_book(request.form['title'], request.form['year'], request.form['author'], request.form['max_pages'], request.form['description'], request.form['artwork'])
@@ -204,7 +199,7 @@ def show_login():
     if 'user' not in g:
         error = None
         if request.method == 'POST':
-            session['token'] = valid_login(request.form['username'], request.form['password'])
+            session['token'] = create_token(request.form['username'], request.form['password'])
             if session['token']:
                 app.logger.debug(f'A successful login to {request.form['username']} account.')
                 return redirect(url_for('index'))
@@ -221,7 +216,7 @@ def show_register():
         error = None
         if request.method == 'POST':
             create_account(request.form['username'], request.form['password'])
-            session['token'] = valid_login(request.form['username'], request.form['password'])
+            session['token'] = create_token(request.form['username'], request.form['password'])
             if session['token']:
                 app.logger.debug(f'A new account {request.form['username']} was created.')
                 return redirect(url_for('index'))
@@ -237,7 +232,7 @@ def profile():
     if 'user' not in g:
         return redirect(url_for('show_login'))
     else:
-        progress = get_progress(session['token'])
+        progress = profile_get_all_progress(session['token'])
         return render_template('profile.html', progress=progress)
 
 @app.route('/profile/edit/<int:book_id>', methods=['POST', 'GET'])
@@ -247,14 +242,14 @@ def edit_prog(book_id=None):
     else:
         notify = None
         if book_id:
-            progress_id = is_in_progress(session['token'], book_id)
+            progress_id = book_get_progress(session['token'], book_id)
             if progress_id:
-                progress = get_prog_one(session['token'], book_id)
+                progress = profile_get_progress(session['token'], book_id)
                 if progress:
                     if request.method == 'POST':
-                        edit_progress(progress_id[0], request.form['pages'], request.form['start_date'], request.form['end_date'])
+                        profile_edit_progress(progress_id[0], request.form['pages'], request.form['start_date'], request.form['end_date'])
                         notify = 'Прогресс изменён.'
-                        progress = get_prog_one(session['token'], book_id)
+                        progress = profile_get_progress(session['token'], book_id)
                     return render_template('edit-prog.html', progress=progress, notify=notify)
                 else:
                     abort(403)
@@ -263,7 +258,7 @@ def edit_prog(book_id=None):
 
 @app.route('/logout')
 def logout():
-    invalid_token(session['token'])
+    delete_token(session['token'])
     session.clear()
     return redirect(url_for('index'))
 
